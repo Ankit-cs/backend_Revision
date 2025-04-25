@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.txt
+*.log
+.vscode/
+.DS_Store
+*.class
+target/
