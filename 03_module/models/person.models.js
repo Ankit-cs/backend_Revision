@@ -1,38 +1,67 @@
-const { MongoStalePrimaryError } = require('mongodb')
-const mongoose=require('mongoose')
-const personSchema=new mongoose.Schema({
-    name:{
-        type:String,
-        required:true
+const bcrypt=require('bcrypt');
+const mongoose = require("mongoose");
+const personSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
     },
-    age:{
-        type:Number,
-        required:true
+    username: {
+      type: String,
+      required: true,
     },
-    work :{
-        type:String,
-        enum:['chef','waiter','manager'],
-        required:true
+    password: {
+      type: String,
+      required: true,
     },
-    mobile:{
-        type:String,
-        required:true
+    age: {
+      type: Number,
+      required: true,
     },
-    email:{
-        type:String,
-        required:true,
-        unique:true
+    work: {
+      type: String,
+      enum: ["chef", "waiter", "manager"],
+      required: true,
     },
-    address:{
-        type:String,
-        required:true
+    mobile: {
+      type: String,
+      required: true,
     },
-    salary:{
-        type:Number,
-        required:true
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
+    address: {
+      type: String,
+      required: true,
+    },
+    salary: {
+      type: Number,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-},{timestamps:true});
-
-const person=mongoose.model('person',personSchema);
-module.exports=person;
+personSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    try {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+      next();
+    } catch (err) {
+      return next(err);
+    }
+  });
+  
+  personSchema.methods.comparePassword = async function (candidatePassword) {
+    try {
+      const isMatch = await bcrypt.compare(candidatePassword, this.password);
+      return isMatch;
+    } catch (err) {
+      throw err;
+    }
+  };
+const person = mongoose.model("person", personSchema);
+module.exports = person;

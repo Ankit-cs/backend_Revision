@@ -4,8 +4,8 @@ const Person = require('../models/person.models');
 
 router.post('/', async (req, res) => {
   try {
-    const { name, age, work, mobile, email, address, salary } = req.body;
-    const newPerson = new Person({ name, age, work, mobile, email, address, salary });
+    const { name, age, work, mobile, email, address, salary,username,password } = req.body;
+    const newPerson = new Person({ name, age, work, mobile, email, address, salary,username,password });
     await newPerson.save();
     res.status(201).json({ message: 'Person added successfully', data: newPerson });
   } catch (error) {
